@@ -9,7 +9,7 @@ public class BlockHit : MonoBehaviour {
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (GameManager.invincible != true)
+        if ((GameManager.invincible != true)&&(collision.gameObject.tag=="Player"))
         {
             AudioSource.PlayClipAtPoint(playerDieSound, Camera.main.transform.localPosition);
             Instantiate(playerDieParticle, collision.transform.localPosition, Quaternion.identity);
@@ -20,11 +20,12 @@ public class BlockHit : MonoBehaviour {
             Destroy(collision.gameObject); // destroy player
 
         }
+
     }
     
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (GameManager.invincible != true)
+        if ((GameManager.invincible != true)&& (collision.gameObject.tag == "Player"))
         {
             StartCoroutine(GameOverPanel());
             AudioSource.PlayClipAtPoint(playerDieSound, Camera.main.transform.localPosition);

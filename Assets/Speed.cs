@@ -2,17 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
-public class ReversePowerup : MonoBehaviour {
+public class Speed : MonoBehaviour {
 
     GameObject player;
     float powerupRunTime = 9;
     float warningTime = 2;
-    public AudioClip reverseSound;
-    public AudioClip reverseEndSound;
-    [HideInInspector]
-    ParticleSystem powerupPS, playerPS;
+    public AudioClip speedSound;
+    public AudioClip speedEndSound;
     TextMeshProUGUI infoText;
+    ParticleSystem powerupPS, playerPS;
     Color psColour;
     private void Start()
     {
@@ -26,7 +24,6 @@ public class ReversePowerup : MonoBehaviour {
 
         //Ensure not instantiated touching another collider
         StartCoroutine(PositionPowerup());
-
     }
 
     IEnumerator PositionPowerup()
@@ -51,22 +48,23 @@ public class ReversePowerup : MonoBehaviour {
     {
         if ((collision.tag == "Player") && (GameManager.powerup != true))
         {
-            AudioSource.PlayClipAtPoint(reverseSound, Camera.main.transform.localPosition);
+            AudioSource.PlayClipAtPoint(speedSound, Camera.main.transform.localPosition);
 
-            GameManager.reverse = true;
+            GameManager.speed = true;
             GameManager.powerup = true;
 
-            StartCoroutine(PlayerReverse());
+            StartCoroutine(SpeedAdjust());
 
             //disable, hide and destroy
             this.GetComponent<SpriteRenderer>().enabled = false;
             this.GetComponentInChildren<ParticleSystem>().Stop();
             this.GetComponent<Collider2D>().enabled = false;
             Destroy(this, powerupRunTime * 2);
+
         }
     }
 
-    IEnumerator PlayerReverse()
+    IEnumerator SpeedAdjust()
     {
         if (GameManager.rb != null)
         {
@@ -80,11 +78,11 @@ public class ReversePowerup : MonoBehaviour {
             //set player colour to match the powerup
             player.GetComponent<SpriteRenderer>().color = this.GetComponent<SpriteRenderer>().color;
 
-
-            //new code
-
             float startTime = Time.time;
             int counter = 0;
+
+            //Adjust speed
+            Time.timeScale = 1.5f;
 
             while (Time.time < startTime + powerupRunTime) // loop for entire powerup time.
             {
@@ -114,10 +112,11 @@ public class ReversePowerup : MonoBehaviour {
                     counter++;
                     yield return null;
                 }
-                infoText.text = "Reverse: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
+                infoText.text = "Speed: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
             }
 
-            AudioSource.PlayClipAtPoint(reverseEndSound, Camera.main.transform.localPosition);
+            AudioSource.PlayClipAtPoint(speedEndSound, Camera.main.transform.localPosition);
+
             if (GameManager.rb != null)
             {
                 player.GetComponent<SpriteRenderer>().color = Color.white;
@@ -125,11 +124,13 @@ public class ReversePowerup : MonoBehaviour {
                 player.GetComponentInChildren<ParticleSystem>().Stop();
             }
 
+            //reset speed
+            Time.timeScale = 1;
+
             infoText.text = "";
-            GameManager.reverse = false;
+            GameManager.speed = false;
             GameManager.powerup = false;
             yield return null;
-
         }
         yield return null;
     }

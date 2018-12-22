@@ -25,14 +25,20 @@ public class GameManager : MonoBehaviour {
     public TextMeshProUGUI highScoreText;
     public AudioClip moveSound;
     public AudioClip scoreSound;
-
+    public TextMeshProUGUI Info;
 
     [Header("Power Ups")]
     public GameObject powerupInvincible;
     public GameObject powerupReverse;
+    public GameObject powerupReverseGravity;
+    public GameObject powerupSpeed;
+
     [HideInInspector]
     public static bool invincible;
     public static bool reverse;
+    public static bool reverseGravity;
+    public static bool speed;
+    public static bool powerup;
 
     //public GameObject movementManager;
     [HideInInspector]
@@ -110,15 +116,21 @@ public class GameManager : MonoBehaviour {
         }
 
         score = 0;
-        
+        Info.text = "";
+
         //Affectors (Powerups)
         invincible = false;
         reverse = false;
+        speed = false;
+        Time.timeScale = 1;
+        reverseGravity = false;
+        Physics2D.gravity = new Vector2(0, -9.81f);
+        powerup = false;
 
         //setup initial level block width and colour
         xScaleDivisor = 2.5f;
         xScale = camX / xScaleDivisor;
-        currentColour = Color.grey; //dependent on colour order in new block
+        currentColour = new Color(.74f, 1, 0.4f); // Color.grey; //dependent on colour order in new block
 
         Camera.main.transform.localPosition = new Vector3(0, 0, -10);
         yOffset = Camera.main.transform.localPosition.y + (camY / 2 + yScale);
@@ -243,7 +255,7 @@ public class GameManager : MonoBehaviour {
                     currentColour = new Color(1,0.5f,0); //orange
                     break;
                 case 0:
-                    currentColour = Color.grey;
+                    currentColour = new Color(.74f, 1, 0.4f); //greeny;
                     break;
                 default:
                     break;
@@ -266,20 +278,35 @@ public class GameManager : MonoBehaviour {
 
     void Affectors()
     {
-        if(timeSinceLastAffector > timeBetweenAffectors)
+        if(timeSinceLastAffector > timeBetweenAffectors) // time for a new affector
         {
-            if(Random.Range(0,4)==0)
-            {
-                // Reverse
-                GameObject powerup = Instantiate(powerupReverse, new Vector3(Random.Range(minX, maxX),
-                                Random.Range(yOffset + powerupReverse.transform.localScale.y * 3 / 6, yOffset + powerupReverse.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
-            }
-            else
+            int a = Random.Range(0, 100);
+            a = 7;
+            if(Mathf.Clamp(a, 0, 25)==a)
             {
                 //Invincible
                 GameObject powerup = Instantiate(powerupInvincible, new Vector3(Random.Range(minX, maxX),
                                 Random.Range(yOffset + powerupInvincible.transform.localScale.y * 3 / 6, yOffset + powerupInvincible.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
             }
+            else if(Mathf.Clamp(a,26,50)==a) 
+            {
+                // Reverse
+                GameObject powerup = Instantiate(powerupReverse, new Vector3(Random.Range(minX, maxX),
+                                Random.Range(yOffset + powerupReverse.transform.localScale.y * 3 / 6, yOffset + powerupReverse.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+            }
+            else if(Mathf.Clamp(a,51,75)==a)
+            {
+                // ReverseGravity
+                GameObject powerup = Instantiate(powerupReverseGravity, new Vector3(Random.Range(minX, maxX),
+                                Random.Range(yOffset + powerupReverseGravity.transform.localScale.y * 3 / 6, yOffset + powerupReverseGravity.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+            }
+            else if(Mathf.Clamp(a,76,100)==a)
+            {
+                //Speed up!
+                GameObject powerup = Instantiate(powerupSpeed, new Vector3(Random.Range(minX, maxX),
+                               Random.Range(yOffset + powerupSpeed.transform.localScale.y * 3 / 6, yOffset + powerupSpeed.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+            }
+
             timeSinceLastAffector = 0;
         }
     }

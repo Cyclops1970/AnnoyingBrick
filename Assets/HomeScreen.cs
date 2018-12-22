@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class HomeScreen : MonoBehaviour {
 
     public Toggle powerups;
-    public GameObject invincible, reverse;
+    public GameObject invincible, lrSwap, udSwap, speed;
 
 	// Use this for initialization
 	void Start () {
@@ -19,12 +19,16 @@ public class HomeScreen : MonoBehaviour {
 	    if(powerups.isOn)
         {
             invincible.SetActive(true);
-            reverse.SetActive(true);
+            udSwap.SetActive(true);
+            lrSwap.SetActive(true);
+            speed.SetActive(true);
         }
         else
         {
             invincible.SetActive(false);
-            reverse.SetActive(false);
+            udSwap.SetActive(false);
+            lrSwap.SetActive(false);
+            speed.SetActive(false);
         }
 	}
 }

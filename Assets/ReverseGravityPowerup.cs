@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
-public class ReversePowerup : MonoBehaviour {
+public class ReverseGravityPowerup : MonoBehaviour {
 
     GameObject player;
     float powerupRunTime = 9;
     float warningTime = 2;
-    public AudioClip reverseSound;
-    public AudioClip reverseEndSound;
-    [HideInInspector]
+    public AudioClip reverseGravitySound;
+    public AudioClip reverseGravityEndSound;
     ParticleSystem powerupPS, playerPS;
     TextMeshProUGUI infoText;
     Color psColour;
@@ -51,25 +49,32 @@ public class ReversePowerup : MonoBehaviour {
     {
         if ((collision.tag == "Player") && (GameManager.powerup != true))
         {
-            AudioSource.PlayClipAtPoint(reverseSound, Camera.main.transform.localPosition);
+            AudioSource.PlayClipAtPoint(reverseGravitySound, Camera.main.transform.localPosition);
 
-            GameManager.reverse = true;
+            GameManager.reverseGravity = true;
             GameManager.powerup = true;
 
-            StartCoroutine(PlayerReverse());
+            StartCoroutine(ReverseGravity());
 
             //disable, hide and destroy
             this.GetComponent<SpriteRenderer>().enabled = false;
             this.GetComponentInChildren<ParticleSystem>().Stop();
             this.GetComponent<Collider2D>().enabled = false;
             Destroy(this, powerupRunTime * 2);
+
         }
     }
 
-    IEnumerator PlayerReverse()
+    IEnumerator ReverseGravity()
     {
         if (GameManager.rb != null)
         {
+            Vector2 cf = GameManager.rb.mass * GameManager.rb.velocity;
+            GameManager.rb.AddForce(-cf, ForceMode2D.Impulse); //Stop the Player
+
+            Vector2 oldGravity = Physics2D.gravity;
+            Physics2D.gravity *= -.5f;
+
             //play the particle system attached to the player
             playerPS.Play();
 
@@ -114,10 +119,10 @@ public class ReversePowerup : MonoBehaviour {
                     counter++;
                     yield return null;
                 }
-                infoText.text = "Reverse: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
+                infoText.text = "Gravity: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
             }
 
-            AudioSource.PlayClipAtPoint(reverseEndSound, Camera.main.transform.localPosition);
+            AudioSource.PlayClipAtPoint(reverseGravityEndSound, Camera.main.transform.localPosition);
             if (GameManager.rb != null)
             {
                 player.GetComponent<SpriteRenderer>().color = Color.white;
@@ -125,11 +130,17 @@ public class ReversePowerup : MonoBehaviour {
                 player.GetComponentInChildren<ParticleSystem>().Stop();
             }
 
-            infoText.text = "";
-            GameManager.reverse = false;
-            GameManager.powerup = false;
-            yield return null;
+            if (GameManager.rb != null)
+            {
+                //set movement back to normal
+                cf = GameManager.rb.mass * GameManager.rb.velocity;
+                GameManager.rb.AddForce(-cf, ForceMode2D.Impulse); //Stop the Player
+                Physics2D.gravity = oldGravity;
+            }
 
+            infoText.text = "";
+            GameManager.reverseGravity = false;
+            GameManager.powerup = false;
         }
         yield return null;
     }

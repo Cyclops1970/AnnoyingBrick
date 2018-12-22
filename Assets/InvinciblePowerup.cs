@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class InvinciblePowerup : MonoBehaviour {
 
@@ -10,25 +11,33 @@ public class InvinciblePowerup : MonoBehaviour {
     public AudioClip invincibleSound;
     public AudioClip invincibleEndSound;
 
+    [HideInInspector]
+    ParticleSystem powerupPS, playerPS;
+    Color psColour;
+
+    TextMeshProUGUI infoText;
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
 
-        ParticleSystem ps = this.GetComponentInChildren<ParticleSystem>();
-        var main = ps.main;
-        main.startColor = Color.green;
-        this.GetComponent<SpriteRenderer>().color = Color.green;
+        powerupPS = this.GetComponentInChildren<ParticleSystem>();
+        psColour = this.GetComponent<SpriteRenderer>().color; //store colour for use in update method.
+        playerPS = player.GetComponentInChildren<ParticleSystem>();
+
+        //setup info text reference.
+        infoText = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().Info;
+
         //Ensure not instantiated touching another collider
         StartCoroutine(PositionPowerup());
-
-
     }
 
     IEnumerator PositionPowerup()
     {
-        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale/5, 0); // had it at /5
-        while (hitColliders.Length>1)
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, this.GetComponent<CircleCollider2D>().radius); 
+        while (hitColliders.Length>2)
         {
+            print(hitColliders.Length);
             foreach(Collider2D c in hitColliders)
             {
                 if (c.gameObject.tag == "Block")
@@ -36,7 +45,7 @@ public class InvinciblePowerup : MonoBehaviour {
                     this.transform.localPosition = new Vector3(this.transform.localPosition.x, this.transform.localPosition.y + 0.1f, GameManager.zPos);
                 }
             }
-            hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale / 5, 0); // had it at /5
+            hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, this.GetComponent<CircleCollider2D>().radius); 
             yield return null;
         }
         yield return null;
@@ -44,11 +53,12 @@ public class InvinciblePowerup : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if ((collision.tag == "Player") && ((GameManager.invincible != true) && (GameManager.reverse != true)))
+        if ((collision.tag == "Player") && (GameManager.powerup != true))
         {
             AudioSource.PlayClipAtPoint(invincibleSound, Camera.main.transform.localPosition);
 
             GameManager.invincible = true;
+            GameManager.powerup = true;
 
             StartCoroutine(PlayerInvincible());
 
@@ -65,45 +75,86 @@ public class InvinciblePowerup : MonoBehaviour {
     {
         if (GameManager.rb != null)
         {
-            player.GetComponentInChildren<ParticleSystem>().Play();
-            ParticleSystem ps = player.GetComponentInChildren<ParticleSystem>();
-            var main = ps.main;
-            main.startColor = Color.green;
+            //infoText.text = "Invincible " + powerupRunTime.ToString("F0");
 
-            player.GetComponent<SpriteRenderer>().color = Color.green;
-            //wait for time period minue the warning time
-            yield return new WaitForSeconds(powerupRunTime - warningTime);
+            //play the particle system attached to the player
+            playerPS.Play(); 
+            
+            //set player particles to match the powerup
+            var playerPSMain = playerPS.main;
+            var powerupPSMain = powerupPS.main;
+            playerPSMain.startColor = powerupPSMain.startColor;
+            //set player colour to match the powerup
+            player.GetComponent<SpriteRenderer>().color = this.GetComponent<SpriteRenderer>().color;
 
-            //warning time
+
+            //new code
+            
             float startTime = Time.time;
             int counter = 0;
-            AudioSource.PlayClipAtPoint(invincibleEndSound, Camera.main.transform.localPosition);
-            while ((Time.time - startTime < warningTime) && (GameManager.rb != null))
+
+            while(Time.time < startTime+powerupRunTime) // loop for entire powerup time.
             {
-                if((counter%2 == 0))
+                if((powerupRunTime-warningTime > Time.time - startTime)&&(GameManager.rb!=null))
                 {
-                    player.GetComponent<SpriteRenderer>().color = Color.red;
-                    main.startColor = Color.red;
+                    //before warning time
+                    infoText.color = Color.white;
+                    yield return null;
                 }
                 else
                 {
-                    player.GetComponent<SpriteRenderer>().color = Color.white;
-                    main.startColor = Color.white;
+                    infoText.color = Color.red;
+
+                    //warning time
+                    if ((counter % 2 == 0))
+                    {
+                        player.GetComponent<SpriteRenderer>().color = Color.red;
+                        playerPSMain.startColor = Color.red;
+                        infoText.color = Color.red;
+                    }
+                    else
+                    {
+                        player.GetComponent<SpriteRenderer>().color = Color.white;
+                        playerPSMain.startColor = Color.white;
+                        infoText.color = Color.white;
+                    }
+                    counter++;
+                    yield return null;
                 }
-                counter++;
-                yield return null;
+                infoText.text = "Invincible: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
             }
-            
+
+            AudioSource.PlayClipAtPoint(invincibleEndSound, Camera.main.transform.localPosition);
             if (GameManager.rb != null)
             {
                 player.GetComponent<SpriteRenderer>().color = Color.white;
-                main.startColor = Color.white;
+                playerPSMain.startColor = Color.white;
                 player.GetComponentInChildren<ParticleSystem>().Stop();
             }
 
+            infoText.text = "";
             GameManager.invincible = false;
+            GameManager.powerup = false;
             yield return null;
+            
         }
+        
         yield return null;
+    }
+
+    private void Update()
+    {
+        //control the colour 
+        var powerupPSMain = powerupPS.main;
+        if (GameManager.powerup)
+        {
+            powerupPSMain.startColor = Color.white;
+            this.GetComponent<SpriteRenderer>().color = Color.white;
+        }
+        else
+        {
+            powerupPSMain.startColor = psColour;
+            this.GetComponent<SpriteRenderer>().color = psColour;
+        }
     }
 }
