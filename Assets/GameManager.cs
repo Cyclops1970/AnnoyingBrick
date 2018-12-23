@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.Advertisements;
 
 public class GameManager : MonoBehaviour {
 
@@ -62,6 +63,8 @@ public class GameManager : MonoBehaviour {
     public static float timeSinceLastAffector = 0;
     float timeBetweenAffectors = 5f; //15
     Color currentColour;
+    int timeBetweenAds = 12;
+    float timeSinceLastAd = 0;
 
     // Use this for initialization
     void Start()
@@ -89,6 +92,8 @@ public class GameManager : MonoBehaviour {
         SetTouchObjects();
          
         Home();
+
+        timeSinceLastAd = Time.time;
     }
 
     public void Home()
@@ -105,7 +110,17 @@ public class GameManager : MonoBehaviour {
 
     public void PlayWrapper()
     {
-        StartCoroutine(Play());
+
+        if(Time.time - timeSinceLastAd > timeBetweenAds)
+        {
+            StartCoroutine(PlayAd());
+
+            timeSinceLastAd = Time.time;
+        }
+        else
+        {
+            StartCoroutine(Play());
+        }
     }
 
     public IEnumerator Play()
@@ -281,7 +296,7 @@ public class GameManager : MonoBehaviour {
         if(timeSinceLastAffector > timeBetweenAffectors) // time for a new affector
         {
             int a = Random.Range(0, 100);
-            a = 7;
+            //a = 7;
             if(Mathf.Clamp(a, 0, 25)==a)
             {
                 //Invincible
@@ -338,4 +353,29 @@ public class GameManager : MonoBehaviour {
         }
         
     }
+
+    //Play Ad
+    IEnumerator PlayAd()
+    {
+        /*
+        if (PlayerPrefs.GetInt("ads", 0) == 0) //default value returned (0) so ads are still valid
+        {   // play an ad
+            if (Advertisement.IsReady("video"))
+            {
+                Advertisement.Show("video");
+            }
+
+            while (Advertisement.isShowing)
+            {
+                yield return null;
+            }
+        }
+        */
+        //Play Game
+        StartCoroutine(Play());
+        
+        yield return null;
+        print("Ad played");
+    }
+
 }

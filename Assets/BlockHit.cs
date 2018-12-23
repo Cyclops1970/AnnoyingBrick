@@ -11,6 +11,7 @@ public class BlockHit : MonoBehaviour {
     {
         if ((GameManager.invincible != true)&&(collision.gameObject.tag=="Player"))
         {
+            Time.timeScale = 1;
             AudioSource.PlayClipAtPoint(playerDieSound, Camera.main.transform.localPosition);
             Instantiate(playerDieParticle, collision.transform.localPosition, Quaternion.identity);
             StartCoroutine(GameOverPanel());
@@ -27,6 +28,7 @@ public class BlockHit : MonoBehaviour {
     {
         if ((GameManager.invincible != true)&& (collision.gameObject.tag == "Player"))
         {
+            Time.timeScale = 1;
             StartCoroutine(GameOverPanel());
             AudioSource.PlayClipAtPoint(playerDieSound, Camera.main.transform.localPosition);
             Instantiate(playerDieParticle, collision.transform.localPosition, Quaternion.identity);
@@ -34,7 +36,6 @@ public class BlockHit : MonoBehaviour {
             GameManager.gameStarted = false; // game ended
 
             Destroy(collision.gameObject); // destroy player
-
         }
     }
 

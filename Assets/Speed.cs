@@ -22,6 +22,9 @@ public class Speed : MonoBehaviour {
         powerupPS = this.GetComponentInChildren<ParticleSystem>();
         playerPS = player.GetComponentInChildren<ParticleSystem>();
 
+        var powerupRB = this.GetComponent<Rigidbody2D>();
+        powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
+        
         //Ensure not instantiated touching another collider
         StartCoroutine(PositionPowerup());
     }
@@ -53,12 +56,16 @@ public class Speed : MonoBehaviour {
             GameManager.speed = true;
             GameManager.powerup = true;
 
+            Vector2 cf = GameManager.rb.mass * GameManager.rb.velocity;
+            GameManager.rb.AddForce(-cf, ForceMode2D.Impulse); //Stop the Player
+
             StartCoroutine(SpeedAdjust());
 
             //disable, hide and destroy
             this.GetComponent<SpriteRenderer>().enabled = false;
             this.GetComponentInChildren<ParticleSystem>().Stop();
             this.GetComponent<Collider2D>().enabled = false;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = false;
             Destroy(this, powerupRunTime * 2);
 
         }
@@ -84,15 +91,15 @@ public class Speed : MonoBehaviour {
             //Adjust speed
             Time.timeScale = 1.5f;
 
-            while (Time.time < startTime + powerupRunTime) // loop for entire powerup time.
+            while (Time.time < (startTime + powerupRunTime*Time.timeScale))//*Time.timeScale) // loop for entire powerup time.
             {
-                if ((powerupRunTime - warningTime > Time.time - startTime) && (GameManager.rb != null))
+                if ((powerupRunTime - warningTime > (Time.time - startTime)/Time.timeScale) && (GameManager.rb != null))
                 {
                     //before warning time
                     infoText.color = Color.white;
                     yield return null;
                 }
-                else
+                else if(GameManager.rb!=null)
                 {
                     infoText.color = Color.red;
 
@@ -112,7 +119,9 @@ public class Speed : MonoBehaviour {
                     counter++;
                     yield return null;
                 }
-                infoText.text = "Speed: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
+                //infoText.text = "Speed: " + (powerupRunTime - (Time.time - startTime)).ToString("F1");
+                infoText.text = "Speed: " + ((powerupRunTime*Time.timeScale - (Time.time - startTime))/Time.timeScale).ToString("F1");
+                yield return null;
             }
 
             AudioSource.PlayClipAtPoint(speedEndSound, Camera.main.transform.localPosition);
@@ -142,11 +151,13 @@ public class Speed : MonoBehaviour {
         {
             powerupPSMain.startColor = Color.white;
             this.GetComponent<SpriteRenderer>().color = Color.white;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = false;
         }
         else
         {
             powerupPSMain.startColor = psColour;
             this.GetComponent<SpriteRenderer>().color = psColour;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = true;
         }
     }
 }

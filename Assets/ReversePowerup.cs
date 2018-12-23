@@ -24,6 +24,9 @@ public class ReversePowerup : MonoBehaviour {
         powerupPS = this.GetComponentInChildren<ParticleSystem>();
         playerPS = player.GetComponentInChildren<ParticleSystem>();
 
+        var powerupRB = this.GetComponent<Rigidbody2D>();
+        powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
+
         //Ensure not instantiated touching another collider
         StartCoroutine(PositionPowerup());
 
@@ -62,6 +65,7 @@ public class ReversePowerup : MonoBehaviour {
             this.GetComponent<SpriteRenderer>().enabled = false;
             this.GetComponentInChildren<ParticleSystem>().Stop();
             this.GetComponent<Collider2D>().enabled = false;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = false;
             Destroy(this, powerupRunTime * 2);
         }
     }
@@ -99,13 +103,13 @@ public class ReversePowerup : MonoBehaviour {
                     infoText.color = Color.red;
 
                     //warning time
-                    if ((counter % 2 == 0))
+                    if ((counter % 2 == 0)&&(player!=null))
                     {
                         player.GetComponent<SpriteRenderer>().color = Color.red;
                         playerPSMain.startColor = Color.red;
                         infoText.color = Color.red;
                     }
-                    else
+                    else if(player!=null)
                     {
                         player.GetComponent<SpriteRenderer>().color = Color.white;
                         playerPSMain.startColor = Color.white;
@@ -141,11 +145,13 @@ public class ReversePowerup : MonoBehaviour {
         {
             powerupPSMain.startColor = Color.white;
             this.GetComponent<SpriteRenderer>().color = Color.white;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = false;
         }
         else
         {
             powerupPSMain.startColor = psColour;
             this.GetComponent<SpriteRenderer>().color = psColour;
+            this.GetComponentInChildren<TextMeshProUGUI>().enabled = true;
         }
     }
 }
