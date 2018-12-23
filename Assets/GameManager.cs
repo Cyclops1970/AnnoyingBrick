@@ -233,10 +233,15 @@ public class GameManager : MonoBehaviour {
         //Set Colours
         sb1.GetComponent<SpriteRenderer>().color = currentColour;
         sb2.GetComponent<SpriteRenderer>().color = currentColour;
+        
         SpriteRenderer[] sr = fb.GetComponentsInChildren<SpriteRenderer>();
         foreach(SpriteRenderer s in sr)
         {
-            s.color = currentColour;
+            if(s.gameObject.tag == "Block")
+            {
+                s.color = currentColour;
+            }
+            
         }
         
 
