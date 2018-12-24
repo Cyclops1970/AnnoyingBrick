@@ -7,15 +7,14 @@ public class HomeScreen : MonoBehaviour {
 
     public Toggle powerups;
     public GameObject invincible, lrSwap, udSwap, speed;
-
-	// Use this for initialization
-	void Start () {
-		
-	}
+    public GameObject helpPanel;
 	
+    
 	// Update is called once per frame
 	void Update ()
     {
+
+        /*
 	    if(powerups.isOn)
         {
             invincible.SetActive(true);
@@ -30,5 +29,11 @@ public class HomeScreen : MonoBehaviour {
             lrSwap.SetActive(false);
             speed.SetActive(false);
         }
+        */
 	}
+    
+    public void ShowHelp()
+    {
+        helpPanel.SetActive(true);
+    }
 }

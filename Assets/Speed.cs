@@ -26,13 +26,13 @@ public class Speed : MonoBehaviour {
         powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
         
         //Ensure not instantiated touching another collider
-        StartCoroutine(PositionPowerup());
+       // StartCoroutine(PositionPowerup());
     }
 
     IEnumerator PositionPowerup()
     {
         Collider2D[] hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale / 5, 0); // had it at /5
-        while (hitColliders.Length > 1)
+        while (hitColliders.Length > 2)
         {
             foreach (Collider2D c in hitColliders)
             {

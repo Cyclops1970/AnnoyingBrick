@@ -63,12 +63,23 @@ public class GameManager : MonoBehaviour {
     public static float timeSinceLastAffector = 0;
     float timeBetweenAffectors = 5f; //15
     Color currentColour;
-    int timeBetweenAds = 12;
+    int timeBetweenAds = 120;
     float timeSinceLastAd = 0;
+
+    string gameID = "2977866";
+    bool testMode = true;
 
     // Use this for initialization
     void Start()
     {
+        if (PlayerPrefs.GetInt("ads", 0) == 0) //default value returned (0) so ads are still valid
+        {
+            if (!Advertisement.isInitialized)
+            {
+                Advertisement.Initialize(gameID, testMode);  //// 1st parameter is String and 2nd is boolean
+            }
+        }
+
         highScore = PlayerPrefs.GetInt("highScore");
 
         //Screen units
@@ -362,12 +373,15 @@ public class GameManager : MonoBehaviour {
     //Play Ad
     IEnumerator PlayAd()
     {
-        /*
-        if (PlayerPrefs.GetInt("ads", 0) == 0) //default value returned (0) so ads are still valid
+        if (PlayerPrefs.GetInt("ads", 0) == 0) //default value returned (0) so ads are still valid. When pay to remove ads, set to another value
         {   // play an ad
             if (Advertisement.IsReady("video"))
             {
                 Advertisement.Show("video");
+            }
+            else
+            {
+                print("Ad not ready!");
             }
 
             while (Advertisement.isShowing)
@@ -375,12 +389,11 @@ public class GameManager : MonoBehaviour {
                 yield return null;
             }
         }
-        */
+        
         //Play Game
         StartCoroutine(Play());
         
         yield return null;
-        print("Ad played");
     }
 
 }

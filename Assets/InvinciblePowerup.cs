@@ -32,7 +32,7 @@ public class InvinciblePowerup : MonoBehaviour {
         infoText = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().Info;
 
         //Ensure not instantiated touching another collider
-        StartCoroutine(PositionPowerup());
+        //StartCoroutine(PositionPowerup());
     }
 
     IEnumerator PositionPowerup()
