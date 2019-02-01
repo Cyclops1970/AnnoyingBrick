@@ -6,7 +6,7 @@ using TMPro;
 public class ReversePowerup : MonoBehaviour {
 
     GameObject player;
-    float powerupRunTime = 9;
+    float powerupRunTime = 10;
     float warningTime = 2;
     public AudioClip reverseSound;
     public AudioClip reverseEndSound;
@@ -14,6 +14,7 @@ public class ReversePowerup : MonoBehaviour {
     ParticleSystem powerupPS, playerPS;
     TextMeshProUGUI infoText;
     Color psColour;
+
     private void Start()
     {
         psColour = this.GetComponent<SpriteRenderer>().color;
@@ -24,14 +25,12 @@ public class ReversePowerup : MonoBehaviour {
         powerupPS = this.GetComponentInChildren<ParticleSystem>();
         playerPS = player.GetComponentInChildren<ParticleSystem>();
 
-        var powerupRB = this.GetComponent<Rigidbody2D>();
-        powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
 
         //Ensure not instantiated touching another collider
-       // StartCoroutine(PositionPowerup());
+        // StartCoroutine(PositionPowerup());
 
     }
-
+    /*
     IEnumerator PositionPowerup()
     {
         Collider2D[] hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale / 5, 0); // had it at /5
@@ -49,7 +48,7 @@ public class ReversePowerup : MonoBehaviour {
         }
         yield return null;
     }
-
+*/
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if ((collision.tag == "Player") && (GameManager.powerup != true))

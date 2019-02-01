@@ -6,7 +6,7 @@ using TMPro;
 public class InvinciblePowerup : MonoBehaviour {
 
     GameObject player;
-    float powerupRunTime = 9;
+    float powerupRunTime = 10;
     float warningTime = 2;
     public AudioClip invincibleSound;
     public AudioClip invincibleEndSound;
@@ -25,8 +25,8 @@ public class InvinciblePowerup : MonoBehaviour {
         psColour = this.GetComponent<SpriteRenderer>().color; //store colour for use in update method.
         playerPS = player.GetComponentInChildren<ParticleSystem>();
 
-        var powerupRB = this.GetComponent<Rigidbody2D>();
-        powerupRB.AddForce(new Vector2(Random.Range(-75, 75),Random.Range(-15,15)));
+        //var powerupRB = this.GetComponent<Rigidbody2D>();
+       // powerupRB.AddForce(new Vector2(Random.Range(-75, 75),Random.Range(-15,15)));
 
         //setup info text reference.
         infoText = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().Info;
@@ -34,7 +34,7 @@ public class InvinciblePowerup : MonoBehaviour {
         //Ensure not instantiated touching another collider
         //StartCoroutine(PositionPowerup());
     }
-
+    /*
     IEnumerator PositionPowerup()
     {
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(gameObject.transform.position, this.GetComponent<CircleCollider2D>().radius); 
@@ -53,7 +53,7 @@ public class InvinciblePowerup : MonoBehaviour {
         }
         yield return null;
     }
-
+    */
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if ((collision.tag == "Player") && (GameManager.powerup != true))

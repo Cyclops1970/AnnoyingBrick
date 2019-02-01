@@ -5,7 +5,7 @@ using TMPro;
 public class Speed : MonoBehaviour {
 
     GameObject player;
-    float powerupRunTime = 9;
+    float powerupRunTime = 10;
     float warningTime = 2;
     public AudioClip speedSound;
     public AudioClip speedEndSound;
@@ -22,13 +22,14 @@ public class Speed : MonoBehaviour {
         powerupPS = this.GetComponentInChildren<ParticleSystem>();
         playerPS = player.GetComponentInChildren<ParticleSystem>();
 
-        var powerupRB = this.GetComponent<Rigidbody2D>();
-        powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
+        //var powerupRB = this.GetComponent<Rigidbody2D>();
+        //powerupRB.AddForce(new Vector2(Random.Range(-75, 75), Random.Range(-15, 15)));
         
         //Ensure not instantiated touching another collider
        // StartCoroutine(PositionPowerup());
     }
 
+    /*
     IEnumerator PositionPowerup()
     {
         Collider2D[] hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale / 5, 0); // had it at /5
@@ -46,7 +47,7 @@ public class Speed : MonoBehaviour {
         }
         yield return null;
     }
-
+    */
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if ((collision.tag == "Player") && (GameManager.powerup != true))
@@ -89,7 +90,7 @@ public class Speed : MonoBehaviour {
             int counter = 0;
 
             //Adjust speed
-            Time.timeScale = 1.5f;
+            Time.timeScale = 1.25f;
 
             while (Time.time < (startTime + powerupRunTime*Time.timeScale))//*Time.timeScale) // loop for entire powerup time.
             {

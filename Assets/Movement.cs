@@ -7,8 +7,8 @@ public class Movement : MonoBehaviour, IPointerDownHandler
 {
     public Vector2 movePlayerRight = new Vector2(3.25f, 23); //-13
     public Vector2 movePlayerLeft = new Vector2(-3.25f, 23);
-    public Vector2 movePlayerRightGravityReversed = new Vector2(3.25f, -10);
-    public Vector2 movePlayerLeftGravityReversed = new Vector2(-3.25f, -10);
+    public Vector2 movePlayerRightGravityReversed = new Vector2(2.25f, -10);
+    public Vector2 movePlayerLeftGravityReversed = new Vector2(-2.25f, -10);
 
     // Use this for initialization
     void Start()

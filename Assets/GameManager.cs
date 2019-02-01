@@ -67,11 +67,12 @@ public class GameManager : MonoBehaviour {
     float timeSinceLastAd = 0;
 
     string gameID = "2977866";
-    bool testMode = true;
+    bool testMode = false;
 
     // Use this for initialization
     void Start()
     {
+        /*
         if (PlayerPrefs.GetInt("ads", 0) == 0) //default value returned (0) so ads are still valid
         {
             if (!Advertisement.isInitialized)
@@ -79,7 +80,7 @@ public class GameManager : MonoBehaviour {
                 Advertisement.Initialize(gameID, testMode);  //// 1st parameter is String and 2nd is boolean
             }
         }
-
+        */
         highScore = PlayerPrefs.GetInt("highScore");
 
         //Screen units
@@ -104,7 +105,7 @@ public class GameManager : MonoBehaviour {
          
         Home();
 
-        timeSinceLastAd = Time.time;
+       // timeSinceLastAd = Time.time;
     }
 
     public void Home()
@@ -124,9 +125,8 @@ public class GameManager : MonoBehaviour {
 
         if(Time.time - timeSinceLastAd > timeBetweenAds)
         {
-            StartCoroutine(PlayAd());
-
-            timeSinceLastAd = Time.time;
+            //StartCoroutine(PlayAd());
+            StartCoroutine(Play());
         }
         else
         {
@@ -140,7 +140,6 @@ public class GameManager : MonoBehaviour {
         {
             Random.InitState(27);
         }
-
         score = 0;
         Info.text = "";
 
@@ -229,22 +228,19 @@ public class GameManager : MonoBehaviour {
             score++;
             AudioSource.PlayClipAtPoint(scoreSound, Camera.main.transform.localPosition);
         }
-
-        if (toggleAffectors.isOn)
-        {
-            Affectors();
-        }
-            
+    
         GameObject fb = Instantiate(fullBlock, new Vector3(0, 0, zPos), Quaternion.identity);
         fb.transform.rotation = Quaternion.Euler(0, 0, Random.Range(10,-10));
         GameObject sb1 = Instantiate(smallBlock, new Vector3(0, 0, zPos), Quaternion.identity);
         sb1.transform.rotation = Quaternion.Euler(0, 0, Random.Range(180, -180));
         GameObject sb2 = Instantiate(smallBlock, new Vector3(0, 0, zPos), Quaternion.identity);
+        //sb1.transform.localScale = new Vector2(0.5f, 0.5f);
+        //sb2.transform.localScale = new Vector2(0.5f, 0.5f);
+
         sb2.transform.rotation = Quaternion.Euler(0, 0, Random.Range(180, -180));
         //Set Colours
         sb1.GetComponent<SpriteRenderer>().color = currentColour;
         sb2.GetComponent<SpriteRenderer>().color = currentColour;
-        
         SpriteRenderer[] sr = fb.GetComponentsInChildren<SpriteRenderer>();
         foreach(SpriteRenderer s in sr)
         {
@@ -254,7 +250,7 @@ public class GameManager : MonoBehaviour {
             }
             
         }
-        
+
 
         //change the width the of levelblock according to progress
         if ((score % 10 == 0)&&(gameStarted))
@@ -294,7 +290,9 @@ public class GameManager : MonoBehaviour {
         }
             
 
-        //setup fullblock
+        //setup fullblock ... can instantiate the side blocks seperately. That way I can scale and make decent graphics for them.
+        // just need to position then at the fb + 1/2 fb + 1/2 long block
+
         fb.transform.localScale = new Vector2(xScale, yScale);// cb.transform.localScale.z);
         fb.transform.localPosition = new Vector3(Random.Range(minX, maxX), yOffset, zPos); //puts current block just offscreen
         
@@ -304,10 +302,13 @@ public class GameManager : MonoBehaviour {
         sb2.transform.localPosition = new Vector3(Random.Range(minX, maxX), 
                                     Random.Range(yOffset + camY/2 - sb2.transform.localScale.y*3, yOffset + camY /2-sb2.transform.localScale.y*5), zPos);
 
-
+        if (toggleAffectors.isOn)
+        {
+            Affectors(fb.transform.localPosition);
+        }
     }
 
-    void Affectors()
+    void Affectors(Vector3 blockPosition)
     {
         if(timeSinceLastAffector > timeBetweenAffectors) // time for a new affector
         {
@@ -316,26 +317,30 @@ public class GameManager : MonoBehaviour {
             if(Mathf.Clamp(a, 0, 25)==a)
             {
                 //Invincible
-                GameObject powerup = Instantiate(powerupInvincible, new Vector3(Random.Range(minX, maxX),
-                                Random.Range(yOffset + powerupInvincible.transform.localScale.y * 3 / 6, yOffset + powerupInvincible.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                //GameObject powerup = Instantiate(powerupInvincible, new Vector3(Random.Range(minX, maxX),
+                  //              Random.Range(yOffset + powerupInvincible.transform.localScale.y * 3 / 6, yOffset + powerupInvincible.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                GameObject powerup = Instantiate(powerupInvincible, blockPosition, Quaternion.identity);
             }
             else if(Mathf.Clamp(a,26,50)==a) 
             {
                 // Reverse
-                GameObject powerup = Instantiate(powerupReverse, new Vector3(Random.Range(minX, maxX),
-                                Random.Range(yOffset + powerupReverse.transform.localScale.y * 3 / 6, yOffset + powerupReverse.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                //GameObject powerup = Instantiate(powerupReverse, new Vector3(Random.Range(minX, maxX),
+                //              Random.Range(yOffset + powerupReverse.transform.localScale.y * 3 / 6, yOffset + powerupReverse.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                GameObject powerup = Instantiate(powerupReverse, blockPosition, Quaternion.identity);
             }
             else if(Mathf.Clamp(a,51,75)==a)
             {
                 // ReverseGravity
-                GameObject powerup = Instantiate(powerupReverseGravity, new Vector3(Random.Range(minX, maxX),
-                                Random.Range(yOffset + powerupReverseGravity.transform.localScale.y * 3 / 6, yOffset + powerupReverseGravity.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                //GameObject powerup = Instantiate(powerupReverseGravity, new Vector3(Random.Range(minX, maxX),
+                // Random.Range(yOffset + powerupReverseGravity.transform.localScale.y * 3 / 6, yOffset + powerupReverseGravity.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                GameObject powerup = Instantiate(powerupReverseGravity, blockPosition, Quaternion.identity);
             }
             else if(Mathf.Clamp(a,76,100)==a)
             {
                 //Speed up!
-                GameObject powerup = Instantiate(powerupSpeed, new Vector3(Random.Range(minX, maxX),
-                               Random.Range(yOffset + powerupSpeed.transform.localScale.y * 3 / 6, yOffset + powerupSpeed.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                //GameObject powerup = Instantiate(powerupSpeed, new Vector3(Random.Range(minX, maxX),
+                //             Random.Range(yOffset + powerupSpeed.transform.localScale.y * 3 / 6, yOffset + powerupSpeed.transform.localScale.y * 5 / 6), zPos), Quaternion.identity);
+                GameObject powerup = Instantiate(powerupSpeed, blockPosition, Quaternion.identity);
             }
 
             timeSinceLastAffector = 0;
@@ -370,6 +375,7 @@ public class GameManager : MonoBehaviour {
         
     }
 
+    /*
     //Play Ad
     IEnumerator PlayAd()
     {
@@ -388,6 +394,8 @@ public class GameManager : MonoBehaviour {
             {
                 yield return null;
             }
+
+            timeSinceLastAd = Time.time;
         }
         
         //Play Game
@@ -396,4 +404,11 @@ public class GameManager : MonoBehaviour {
         yield return null;
     }
 
+    public void RemoveAds()
+    {
+        //StartCoroutine(GameManager.manager.Message("Ads Removed!", Vector2.zero, 10, 4, Color.white));
+        PlayerPrefs.SetInt("ads", 1);//1 means ads should be removed
+        //ShopButton.shopButton.CloseShop();
+    }
+    */
 }
